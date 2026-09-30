@@ -284,6 +284,7 @@ struct RecordInputView: View {
             FieldSection(title: "メモ（自由記載）") {
                 TextEditor(text: $draft.memo)
                     .font(.system(size: 17))
+                    .foregroundColor(Color.textPrimary)
                     .frame(minHeight: 140)
                     .scrollContentBackground(.hidden)
                     .overlay(alignment: .topLeading) {
@@ -293,6 +294,7 @@ struct RecordInputView: View {
                                 .foregroundStyle(Color.textSecondary.opacity(0.75))
                                 .padding(.top, 8)
                                 .padding(.leading, 5)
+                                .allowsHitTesting(false)
                         }
                     }
             }
@@ -816,6 +818,7 @@ struct FieldSection<Content: View>: View {
                 .overlay(
                     RoundedRectangle(cornerRadius: 14)
                         .stroke(Color.inputBorder, lineWidth: 1)
+                        .allowsHitTesting(false)
                 )
         }
         .frame(maxWidth: .infinity, alignment: .leading)
