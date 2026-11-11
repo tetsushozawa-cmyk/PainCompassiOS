@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8D0D7C922D2E4D92A4F30121 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8D0D7C932D2E4D92A4F30121 /* Assets.xcassets */; };
 		8D0D7C822D2E4D92A4F30121 /* PainCompassiOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0D7C812D2E4D92A4F30121 /* PainCompassiOSApp.swift */; };
 		8D0D7C832D2E4D92A4F30121 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0D7C842D2E4D92A4F30121 /* ContentView.swift */; };
+		8D0D7C922D2E4D92A4F30121 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8D0D7C932D2E4D92A4F30121 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -254,7 +254,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KUM946PZSH;
 				ENABLE_PREVIEWS = YES;
@@ -270,8 +270,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.PainCompassiOS;
+				MARKETING_VERSION = 1.01;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tetsushozawa.PainCompass;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
@@ -284,7 +284,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KUM946PZSH;
 				ENABLE_PREVIEWS = YES;
@@ -300,8 +300,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.PainCompassiOS;
+				MARKETING_VERSION = 1.01;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tetsushozawa.PainCompass;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;

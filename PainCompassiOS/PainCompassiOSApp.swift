@@ -8,6 +8,7 @@ struct PainCompassiOSApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(store)
+                .preferredColorScheme(.light)
         }
     }
 }
