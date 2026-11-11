@@ -6,6 +6,11 @@ struct PressureMeasurement: Equatable, Hashable {
     let measuredAt: Date
 }
 
+struct PressureHistoryEntry: Codable, Equatable {
+    let hectopascals: Double
+    let measuredAt: Date
+}
+
 @MainActor
 final class PressureMeasurementStore: ObservableObject {
     enum State: Equatable {
@@ -17,9 +22,16 @@ final class PressureMeasurementStore: ObservableObject {
 
     @Published private(set) var latestMeasurement: PressureMeasurement?
     @Published private(set) var state: State = .idle
+    @Published private(set) var history: [PressureHistoryEntry] = []
 
     private let altimeter = CMAltimeter()
+    private let historyKey = "barometric_pressure_history_json"
+    private let saveInterval: TimeInterval = 6 * 60 * 60
     private var isMeasuring = false
+
+    init() {
+        loadHistory()
+    }
 
     func startMeasuring() {
         guard !isMeasuring else { return }
@@ -41,10 +53,12 @@ final class PressureMeasurementStore: ObservableObject {
             }
 
             guard let pressure = data?.pressure.doubleValue else { return }
-            self.latestMeasurement = PressureMeasurement(
+            let measurement = PressureMeasurement(
                 hectopascals: pressure * 10,
                 measuredAt: Date()
             )
+            self.latestMeasurement = measurement
+            self.saveToHistoryIfNeeded(measurement)
         }
     }
 
@@ -56,5 +70,35 @@ final class PressureMeasurementStore: ObservableObject {
         if state == .measuring {
             state = .idle
         }
+    }
+
+    private func loadHistory() {
+        guard let data = UserDefaults.standard.data(forKey: historyKey),
+              let decodedHistory = try? JSONDecoder().decode([PressureHistoryEntry].self, from: data) else {
+            history = []
+            return
+        }
+
+        history = decodedHistory.sorted { $0.measuredAt < $1.measuredAt }
+    }
+
+    private func saveToHistoryIfNeeded(_ measurement: PressureMeasurement) {
+        if let latestEntry = history.last,
+           measurement.measuredAt.timeIntervalSince(latestEntry.measuredAt) < saveInterval {
+            return
+        }
+
+        history.append(
+            PressureHistoryEntry(
+                hectopascals: measurement.hectopascals,
+                measuredAt: measurement.measuredAt
+            )
+        )
+        saveHistory()
+    }
+
+    private func saveHistory() {
+        guard let data = try? JSONEncoder().encode(history) else { return }
+        UserDefaults.standard.set(data, forKey: historyKey)
     }
 }
