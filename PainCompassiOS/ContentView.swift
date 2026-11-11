@@ -14,6 +14,8 @@ struct DiaryRecord: Identifiable, Codable, Equatable {
     var pressure: String
     var dailyActivity: String
     var memo: String
+    var measuredPressureHectopascals: Double? = nil
+    var pressureMeasuredAt: Date? = nil
 }
 
 final class DiaryRecordStore: ObservableObject {
@@ -86,6 +88,8 @@ struct ReadableSharedRecord: Encodable {
         case pressure = "気圧の変化"
         case dailyActivity = "日常活動性"
         case memo = "メモ"
+        case measuredPressureHectopascals = "実測気圧（hPa）"
+        case pressureMeasuredAt = "気圧測定時刻"
     }
 
     func encode(to encoder: Encoder) throws {
@@ -101,6 +105,13 @@ struct ReadableSharedRecord: Encodable {
         try container.encode(record.pressure, forKey: .pressure)
         try container.encode(record.dailyActivity, forKey: .dailyActivity)
         try container.encode(record.memo, forKey: .memo)
+        try container.encodeIfPresent(record.measuredPressureHectopascals, forKey: .measuredPressureHectopascals)
+        if let pressureMeasuredAt = record.pressureMeasuredAt {
+            try container.encode(
+                DateFormatter.pressureMeasurementDateTime.string(from: pressureMeasuredAt),
+                forKey: .pressureMeasuredAt
+            )
+        }
     }
 }
 
@@ -116,6 +127,13 @@ struct DraftRecord: Equatable, Hashable {
     var pressure = PainRecordOptions.pressures[0]
     var dailyActivity = PainRecordOptions.dailyActivities[0]
     var memo = ""
+    var measuredPressureHectopascals: Double?
+    var pressureMeasuredAt: Date?
+
+    init(pressureMeasurement: PressureMeasurement? = nil) {
+        measuredPressureHectopascals = pressureMeasurement?.hectopascals
+        pressureMeasuredAt = pressureMeasurement?.measuredAt
+    }
 
     var painTimeText: String {
         PainRecordOptions.painTimes.filter { painTimes.contains($0) }.joined(separator: "、")
@@ -133,13 +151,15 @@ struct DraftRecord: Equatable, Hashable {
             temperature: temperature,
             pressure: pressure,
             dailyActivity: dailyActivity,
-            memo: memo
+            memo: memo,
+            measuredPressureHectopascals: measuredPressureHectopascals,
+            pressureMeasuredAt: pressureMeasuredAt
         )
     }
 }
 
 enum AppRoute: Hashable {
-    case recordInput
+    case recordInput(PressureMeasurement?)
     case savedRecords
     case mandalaData
     case environment(DraftRecord)
@@ -176,6 +196,13 @@ extension DateFormatter {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ja_JP")
         formatter.dateFormat = "yyyyMMdd_HHmmss"
+        return formatter
+    }()
+
+    static let pressureMeasurementDateTime: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ja_JP")
+        formatter.dateFormat = "yyyy/MM/dd HH:mm:ss"
         return formatter
     }()
 }
@@ -226,9 +253,12 @@ struct ContentView: View {
                     Spacer(minLength: 56)
 
                     VStack(spacing: 18) {
-                        NavigationLink(value: AppRoute.recordInput) {
+                        Button {
+                            path.append(.recordInput(pressureStore.latestMeasurement))
+                        } label: {
                             HomeButtonLabel(title: "記録を入力する", color: .accentGreen, foreground: .white)
                         }
+                        .buttonStyle(.plain)
 
                         NavigationLink(value: AppRoute.savedRecords) {
                             HomeButtonLabel(title: "保存を見る", color: .clearButton, foreground: .black)
@@ -245,8 +275,8 @@ struct ContentView: View {
             .navigationBarHidden(true)
             .navigationDestination(for: AppRoute.self) { route in
                 switch route {
-                case .recordInput:
-                    RecordInputView(path: $path)
+                case .recordInput(let pressureMeasurement):
+                    RecordInputView(path: $path, pressureMeasurement: pressureMeasurement)
                 case .savedRecords:
                     SavedRecordsView(path: $path)
                 case .mandalaData:
@@ -307,7 +337,12 @@ struct HomeButtonLabel: View {
 
 struct RecordInputView: View {
     @Binding var path: [AppRoute]
-    @State private var draft = DraftRecord()
+    @State private var draft: DraftRecord
+
+    init(path: Binding<[AppRoute]>, pressureMeasurement: PressureMeasurement?) {
+        _path = path
+        _draft = State(initialValue: DraftRecord(pressureMeasurement: pressureMeasurement))
+    }
 
     var body: some View {
         FormPage {

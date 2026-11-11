@@ -1,7 +1,7 @@
 import CoreMotion
 import Foundation
 
-struct PressureMeasurement: Equatable {
+struct PressureMeasurement: Equatable, Hashable {
     let hectopascals: Double
     let measuredAt: Date
 }
