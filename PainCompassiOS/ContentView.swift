@@ -196,6 +196,7 @@ extension Color {
 }
 
 struct ContentView: View {
+    @EnvironmentObject private var pressureStore: PressureMeasurementStore
     @State private var path: [AppRoute] = []
 
     var body: some View {
@@ -218,6 +219,9 @@ struct ContentView: View {
                         .font(.system(size: 18))
                         .foregroundStyle(Color.textSecondary)
                         .padding(.top, 8)
+
+                    PressureStatusView()
+                        .padding(.top, 12)
 
                     Spacer(minLength: 56)
 
@@ -251,6 +255,36 @@ struct ContentView: View {
                     EnvironmentInputView(path: $path, draft: draft)
                 }
             }
+        }
+    }
+}
+
+struct PressureStatusView: View {
+    @EnvironmentObject private var pressureStore: PressureMeasurementStore
+
+    var body: some View {
+        VStack(spacing: 3) {
+            if let measurement = pressureStore.latestMeasurement {
+                Text(String(format: "最新気圧 %.1f hPa", measurement.hectopascals))
+                Text("測定時刻 \(measurement.measuredAt.formatted(date: .omitted, time: .standard))")
+            } else {
+                Text(statusText)
+            }
+        }
+        .font(.system(size: 12))
+        .foregroundStyle(Color.textSecondary)
+    }
+
+    private var statusText: String {
+        switch pressureStore.state {
+        case .idle:
+            "気圧測定を待機中"
+        case .measuring:
+            "気圧を取得中…"
+        case .unavailable:
+            "気圧センサーを利用できません"
+        case .failed:
+            "気圧を取得できませんでした"
         }
     }
 }

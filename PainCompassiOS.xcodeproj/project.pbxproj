@@ -10,6 +10,7 @@
 		8D0D7C822D2E4D92A4F30121 /* PainCompassiOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0D7C812D2E4D92A4F30121 /* PainCompassiOSApp.swift */; };
 		8D0D7C832D2E4D92A4F30121 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0D7C842D2E4D92A4F30121 /* ContentView.swift */; };
 		8D0D7C922D2E4D92A4F30121 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8D0D7C932D2E4D92A4F30121 /* Assets.xcassets */; };
+		A1B2C3D42D2E4D92A4F30121 /* PressureMeasurementStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D52D2E4D92A4F30121 /* PressureMeasurementStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -17,6 +18,7 @@
 		8D0D7C812D2E4D92A4F30121 /* PainCompassiOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PainCompassiOSApp.swift; sourceTree = "<group>"; };
 		8D0D7C842D2E4D92A4F30121 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8D0D7C932D2E4D92A4F30121 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1B2C3D52D2E4D92A4F30121 /* PressureMeasurementStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressureMeasurementStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +53,7 @@
 			children = (
 				8D0D7C812D2E4D92A4F30121 /* PainCompassiOSApp.swift */,
 				8D0D7C842D2E4D92A4F30121 /* ContentView.swift */,
+				A1B2C3D52D2E4D92A4F30121 /* PressureMeasurementStore.swift */,
 				8D0D7C932D2E4D92A4F30121 /* Assets.xcassets */,
 			);
 			path = PainCompassiOS;
@@ -127,6 +130,7 @@
 			files = (
 				8D0D7C832D2E4D92A4F30121 /* ContentView.swift in Sources */,
 				8D0D7C822D2E4D92A4F30121 /* PainCompassiOSApp.swift in Sources */,
+				A1B2C3D42D2E4D92A4F30121 /* PressureMeasurementStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,6 +265,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "疼痛コンパス";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSMotionUsageDescription = "気圧の変化を測定するためにモーションセンサーを使用します。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -291,6 +296,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "疼痛コンパス";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSMotionUsageDescription = "気圧の変化を測定するためにモーションセンサーを使用します。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
