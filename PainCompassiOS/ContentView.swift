@@ -297,6 +297,8 @@ struct PressureStatusView: View {
             if let measurement = pressureStore.latestMeasurement {
                 Text(String(format: "最新気圧 %.1f hPa", measurement.hectopascals))
                 Text("測定時刻 \(measurement.measuredAt.formatted(date: .omitted, time: .standard))")
+                PressureChangeStatusView(result: pressureStore.latestPressureChange)
+                    .padding(.top, 5)
             } else {
                 Text(statusText)
             }
@@ -315,6 +317,36 @@ struct PressureStatusView: View {
             "気圧センサーを利用できません"
         case .failed:
             "気圧を取得できませんでした"
+        }
+    }
+}
+
+struct PressureChangeStatusView: View {
+    let result: PressureChangeCalculationResult
+
+    var body: some View {
+        VStack(spacing: 2) {
+            Text("約24時間前との差")
+            switch result {
+            case .calculated(let change):
+                Text(changeText(change))
+                Text(
+                    "比較対象：\(DateFormatter.pressureMeasurementDateTime.string(from: change.comparisonData.measuredAt))"
+                )
+            case .comparisonDataUnavailable:
+                Text("比較データなし")
+            }
+        }
+    }
+
+    private func changeText(_ change: PressureChange) -> String {
+        switch change.direction {
+        case .rising:
+            String(format: "＋%.1f hPa ↑", abs(change.differenceHectopascals))
+        case .falling:
+            String(format: "−%.1f hPa ↓", abs(change.differenceHectopascals))
+        case .unchanged:
+            "0.0 hPa →"
         }
     }
 }

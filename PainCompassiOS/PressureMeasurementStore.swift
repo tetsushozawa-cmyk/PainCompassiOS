@@ -29,6 +29,25 @@ final class PressureMeasurementStore: ObservableObject {
     private let saveInterval: TimeInterval = 6 * 60 * 60
     private var isMeasuring = false
 
+    var latestPressureChange: PressureChangeCalculationResult {
+        guard let latestMeasurement else {
+            return .comparisonDataUnavailable
+        }
+
+        return PressureChangeCalculator.calculate(
+            current: PressureDataPoint(
+                hectopascals: latestMeasurement.hectopascals,
+                measuredAt: latestMeasurement.measuredAt
+            ),
+            history: history.map {
+                PressureDataPoint(
+                    hectopascals: $0.hectopascals,
+                    measuredAt: $0.measuredAt
+                )
+            }
+        )
+    }
+
     init() {
         loadHistory()
     }
