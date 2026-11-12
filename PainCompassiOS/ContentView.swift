@@ -16,6 +16,7 @@ struct DiaryRecord: Identifiable, Codable, Equatable {
     var memo: String
     var measuredPressureHectopascals: Double? = nil
     var pressureMeasuredAt: Date? = nil
+    var yesterdayStepCount: Int? = nil
 }
 
 final class DiaryRecordStore: ObservableObject {
@@ -90,6 +91,7 @@ struct ReadableSharedRecord: Encodable {
         case memo = "メモ"
         case measuredPressureHectopascals = "実測気圧（hPa）"
         case pressureMeasuredAt = "気圧測定時刻"
+        case yesterdayStepCount = "昨日の歩数"
     }
 
     func encode(to encoder: Encoder) throws {
@@ -112,6 +114,7 @@ struct ReadableSharedRecord: Encodable {
                 forKey: .pressureMeasuredAt
             )
         }
+        try container.encodeIfPresent(record.yesterdayStepCount, forKey: .yesterdayStepCount)
     }
 }
 
@@ -132,7 +135,10 @@ struct DraftRecord: Equatable, Hashable {
         PainRecordOptions.painTimes.filter { painTimes.contains($0) }.joined(separator: "、")
     }
 
-    func record(pressureMeasurement: PressureMeasurement?) -> DiaryRecord {
+    func record(
+        pressureMeasurement: PressureMeasurement?,
+        yesterdayStepCount: Int?
+    ) -> DiaryRecord {
         DiaryRecord(
             dateTime: dateTime,
             painLevel: painLevel,
@@ -146,7 +152,8 @@ struct DraftRecord: Equatable, Hashable {
             dailyActivity: dailyActivity,
             memo: memo,
             measuredPressureHectopascals: pressureMeasurement?.hectopascals,
-            pressureMeasuredAt: pressureMeasurement?.measuredAt
+            pressureMeasuredAt: pressureMeasurement?.measuredAt,
+            yesterdayStepCount: yesterdayStepCount
         )
     }
 }
@@ -242,6 +249,9 @@ struct ContentView: View {
                     PressureStatusView()
                         .padding(.top, 12)
 
+                    YesterdayStepCountStatusView()
+                        .padding(.top, 6)
+
                     Spacer(minLength: 56)
 
                     VStack(spacing: 18) {
@@ -274,6 +284,27 @@ struct ContentView: View {
                     EnvironmentInputView(path: $path, draft: draft)
                 }
             }
+        }
+    }
+}
+
+struct YesterdayStepCountStatusView: View {
+    @EnvironmentObject private var stepCountStore: YesterdayStepCountStore
+
+    var body: some View {
+        Text(statusText)
+            .font(.system(size: 12))
+            .foregroundStyle(Color.textSecondary)
+    }
+
+    private var statusText: String {
+        switch stepCountStore.state {
+        case .idle, .loading:
+            "昨日の歩数：取得中…"
+        case .loaded(let stepCount):
+            "昨日の歩数：\(stepCount)歩"
+        case .unavailable:
+            "昨日の歩数：取得できません"
         }
     }
 }
@@ -425,6 +456,7 @@ struct RecordInputView: View {
 struct EnvironmentInputView: View {
     @EnvironmentObject private var store: DiaryRecordStore
     @EnvironmentObject private var pressureStore: PressureMeasurementStore
+    @EnvironmentObject private var stepCountStore: YesterdayStepCountStore
     @Binding var path: [AppRoute]
     @State private var draft: DraftRecord
     @State private var didSave = false
@@ -447,7 +479,12 @@ struct EnvironmentInputView: View {
             OptionPicker(title: "日常の通勤・通学・家事の活動性", selection: $draft.dailyActivity, options: PainRecordOptions.dailyActivities)
 
             Button {
-                store.add(draft.record(pressureMeasurement: pressureStore.currentMeasurement()))
+                store.add(
+                    draft.record(
+                        pressureMeasurement: pressureStore.currentMeasurement(),
+                        yesterdayStepCount: stepCountStore.currentYesterdayStepCount()
+                    )
+                )
                 didSave = true
             } label: {
                 ActionLabel(title: "保存", color: .accentGreen, foreground: .white)
@@ -602,6 +639,10 @@ struct SavedRecordsView: View {
                     "気圧測定時刻：\(DateFormatter.pressureMeasurementDateTime.string(from: pressureMeasuredAt))"
                 )
             }
+        }
+
+        if let yesterdayStepCount = record.yesterdayStepCount {
+            lines.append("昨日の歩数：\(yesterdayStepCount)歩")
         }
 
         lines.append("日常の通勤・通学・家事の活動性: \(record.dailyActivity)")

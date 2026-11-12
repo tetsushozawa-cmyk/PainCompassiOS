@@ -12,6 +12,7 @@
 		8D0D7C922D2E4D92A4F30121 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8D0D7C932D2E4D92A4F30121 /* Assets.xcassets */; };
 		A1B2C3D42D2E4D92A4F30121 /* PressureMeasurementStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D52D2E4D92A4F30121 /* PressureMeasurementStore.swift */; };
 		B2C3D4E52D2E4D92A4F30121 /* PressureChangeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E62D2E4D92A4F30121 /* PressureChangeCalculator.swift */; };
+		C3D4E5F62D2E4D92A4F30121 /* YesterdayStepCountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F72D2E4D92A4F30121 /* YesterdayStepCountStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,8 @@
 		8D0D7C932D2E4D92A4F30121 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1B2C3D52D2E4D92A4F30121 /* PressureMeasurementStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressureMeasurementStore.swift; sourceTree = "<group>"; };
 		B2C3D4E62D2E4D92A4F30121 /* PressureChangeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressureChangeCalculator.swift; sourceTree = "<group>"; };
+		C3D4E5F72D2E4D92A4F30121 /* YesterdayStepCountStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YesterdayStepCountStore.swift; sourceTree = "<group>"; };
+		C3D4E5F82D2E4D92A4F30121 /* PainCompassiOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PainCompassiOS.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +60,8 @@
 				8D0D7C842D2E4D92A4F30121 /* ContentView.swift */,
 				A1B2C3D52D2E4D92A4F30121 /* PressureMeasurementStore.swift */,
 				B2C3D4E62D2E4D92A4F30121 /* PressureChangeCalculator.swift */,
+				C3D4E5F72D2E4D92A4F30121 /* YesterdayStepCountStore.swift */,
+				C3D4E5F82D2E4D92A4F30121 /* PainCompassiOS.entitlements */,
 				8D0D7C932D2E4D92A4F30121 /* Assets.xcassets */,
 			);
 			path = PainCompassiOS;
@@ -94,6 +99,11 @@
 				TargetAttributes = {
 					8D0D7C692D2E4D92A4F30121 = {
 						CreatedOnToolsVersion = 26.3;
+						SystemCapabilities = {
+							com.apple.HealthKit = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -135,6 +145,7 @@
 				8D0D7C822D2E4D92A4F30121 /* PainCompassiOSApp.swift in Sources */,
 				A1B2C3D42D2E4D92A4F30121 /* PressureMeasurementStore.swift in Sources */,
 				B2C3D4E52D2E4D92A4F30121 /* PressureChangeCalculator.swift in Sources */,
+				C3D4E5F62D2E4D92A4F30121 /* YesterdayStepCountStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,6 +273,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = PainCompassiOS/PainCompassiOS.entitlements;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KUM946PZSH;
@@ -270,6 +282,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "疼痛コンパス";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSMotionUsageDescription = "気圧の変化を測定するためにモーションセンサーを使用します。";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "昨日の歩数を表示するために、ヘルスケアの歩数データを読み取ります。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -293,6 +306,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = PainCompassiOS/PainCompassiOS.entitlements;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KUM946PZSH;
@@ -301,6 +315,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "疼痛コンパス";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSMotionUsageDescription = "気圧の変化を測定するためにモーションセンサーを使用します。";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "昨日の歩数を表示するために、ヘルスケアの歩数データを読み取ります。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
