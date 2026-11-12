@@ -17,6 +17,7 @@ struct DiaryRecord: Identifiable, Codable, Equatable {
     var measuredPressureHectopascals: Double? = nil
     var pressureMeasuredAt: Date? = nil
     var yesterdayStepCount: Int? = nil
+    var dayBeforeYesterdayStepCount: Int? = nil
 }
 
 final class DiaryRecordStore: ObservableObject {
@@ -92,6 +93,7 @@ struct ReadableSharedRecord: Encodable {
         case measuredPressureHectopascals = "実測気圧（hPa）"
         case pressureMeasuredAt = "気圧測定時刻"
         case yesterdayStepCount = "昨日の歩数"
+        case dayBeforeYesterdayStepCount = "一昨日の歩数"
     }
 
     func encode(to encoder: Encoder) throws {
@@ -115,6 +117,10 @@ struct ReadableSharedRecord: Encodable {
             )
         }
         try container.encodeIfPresent(record.yesterdayStepCount, forKey: .yesterdayStepCount)
+        try container.encodeIfPresent(
+            record.dayBeforeYesterdayStepCount,
+            forKey: .dayBeforeYesterdayStepCount
+        )
     }
 }
 
@@ -137,7 +143,8 @@ struct DraftRecord: Equatable, Hashable {
 
     func record(
         pressureMeasurement: PressureMeasurement?,
-        yesterdayStepCount: Int?
+        yesterdayStepCount: Int?,
+        dayBeforeYesterdayStepCount: Int?
     ) -> DiaryRecord {
         DiaryRecord(
             dateTime: dateTime,
@@ -153,7 +160,8 @@ struct DraftRecord: Equatable, Hashable {
             memo: memo,
             measuredPressureHectopascals: pressureMeasurement?.hectopascals,
             pressureMeasuredAt: pressureMeasurement?.measuredAt,
-            yesterdayStepCount: yesterdayStepCount
+            yesterdayStepCount: yesterdayStepCount,
+            dayBeforeYesterdayStepCount: dayBeforeYesterdayStepCount
         )
     }
 }
@@ -292,19 +300,33 @@ struct YesterdayStepCountStatusView: View {
     @EnvironmentObject private var stepCountStore: YesterdayStepCountStore
 
     var body: some View {
-        Text(statusText)
+        VStack(spacing: 3) {
+            Text(yesterdayStatusText)
+            Text(dayBeforeYesterdayStatusText)
+        }
             .font(.system(size: 12))
             .foregroundStyle(Color.textSecondary)
     }
 
-    private var statusText: String {
+    private var yesterdayStatusText: String {
         switch stepCountStore.state {
         case .idle, .loading:
             "昨日の歩数：取得中…"
-        case .loaded(let stepCount):
-            "昨日の歩数：\(stepCount)歩"
+        case .loaded(let stepCount, _):
+            stepCount.map { "昨日の歩数：\($0)歩" } ?? "昨日の歩数：取得できません"
         case .unavailable:
             "昨日の歩数：取得できません"
+        }
+    }
+
+    private var dayBeforeYesterdayStatusText: String {
+        switch stepCountStore.state {
+        case .idle, .loading:
+            "一昨日の歩数：取得中…"
+        case .loaded(_, let stepCount):
+            stepCount.map { "一昨日の歩数：\($0)歩" } ?? "一昨日の歩数：取得できません"
+        case .unavailable:
+            "一昨日の歩数：取得できません"
         }
     }
 }
@@ -482,7 +504,8 @@ struct EnvironmentInputView: View {
                 store.add(
                     draft.record(
                         pressureMeasurement: pressureStore.currentMeasurement(),
-                        yesterdayStepCount: stepCountStore.currentYesterdayStepCount()
+                        yesterdayStepCount: stepCountStore.currentYesterdayStepCount(),
+                        dayBeforeYesterdayStepCount: stepCountStore.currentDayBeforeYesterdayStepCount()
                     )
                 )
                 didSave = true
@@ -643,6 +666,10 @@ struct SavedRecordsView: View {
 
         if let yesterdayStepCount = record.yesterdayStepCount {
             lines.append("昨日の歩数：\(yesterdayStepCount)歩")
+        }
+
+        if let dayBeforeYesterdayStepCount = record.dayBeforeYesterdayStepCount {
+            lines.append("一昨日の歩数：\(dayBeforeYesterdayStepCount)歩")
         }
 
         lines.append("日常の通勤・通学・家事の活動性: \(record.dailyActivity)")

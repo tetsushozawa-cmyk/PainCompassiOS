@@ -6,7 +6,7 @@ final class YesterdayStepCountStore: ObservableObject {
     enum State: Equatable {
         case idle
         case loading
-        case loaded(Int)
+        case loaded(yesterday: Int?, dayBeforeYesterday: Int?)
         case unavailable
     }
 
@@ -38,9 +38,21 @@ final class YesterdayStepCountStore: ObservableObject {
             do {
                 try await healthStore.requestAuthorization(toShare: [], read: [stepType])
                 let now = Date()
-                let stepCount = try await yesterdayStepCount(for: stepType, now: now)
+                let yesterdayStepCount = try? await stepCount(
+                    for: stepType,
+                    daysBeforeToday: 1,
+                    now: now
+                )
+                let dayBeforeYesterdayStepCount = try? await stepCount(
+                    for: stepType,
+                    daysBeforeToday: 2,
+                    now: now
+                )
                 loadedStartOfToday = calendar.startOfDay(for: now)
-                state = .loaded(stepCount)
+                state = .loaded(
+                    yesterday: yesterdayStepCount,
+                    dayBeforeYesterday: dayBeforeYesterdayStepCount
+                )
             } catch {
                 loadedStartOfToday = nil
                 state = .unavailable
@@ -49,25 +61,42 @@ final class YesterdayStepCountStore: ObservableObject {
     }
 
     func currentYesterdayStepCount(at referenceDate: Date = Date()) -> Int? {
-        guard case .loaded(let stepCount) = state,
+        guard case .loaded(let stepCount, _) = state,
               loadedStartOfToday == calendar.startOfDay(for: referenceDate) else {
             return nil
         }
         return stepCount
     }
 
-    private func yesterdayStepCount(
+    func currentDayBeforeYesterdayStepCount(at referenceDate: Date = Date()) -> Int? {
+        guard case .loaded(_, let stepCount) = state,
+              loadedStartOfToday == calendar.startOfDay(for: referenceDate) else {
+            return nil
+        }
+        return stepCount
+    }
+
+    private func stepCount(
         for stepType: HKQuantityType,
+        daysBeforeToday: Int,
         now: Date
     ) async throws -> Int {
         let startOfToday = calendar.startOfDay(for: now)
-        guard let startOfYesterday = calendar.date(byAdding: .day, value: -1, to: startOfToday) else {
+        guard let intervalStart = calendar.date(
+            byAdding: .day,
+            value: -daysBeforeToday,
+            to: startOfToday
+        ), let intervalEnd = calendar.date(
+            byAdding: .day,
+            value: -(daysBeforeToday - 1),
+            to: startOfToday
+        ) else {
             throw StepCountError.invalidDateRange
         }
 
         let predicate = HKQuery.predicateForSamples(
-            withStart: startOfYesterday,
-            end: startOfToday,
+            withStart: intervalStart,
+            end: intervalEnd,
             options: [.strictStartDate, .strictEndDate]
         )
 
