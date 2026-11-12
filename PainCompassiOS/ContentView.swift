@@ -127,19 +127,12 @@ struct DraftRecord: Equatable, Hashable {
     var pressure = PainRecordOptions.pressures[0]
     var dailyActivity = PainRecordOptions.dailyActivities[0]
     var memo = ""
-    var measuredPressureHectopascals: Double?
-    var pressureMeasuredAt: Date?
-
-    init(pressureMeasurement: PressureMeasurement? = nil) {
-        measuredPressureHectopascals = pressureMeasurement?.hectopascals
-        pressureMeasuredAt = pressureMeasurement?.measuredAt
-    }
 
     var painTimeText: String {
         PainRecordOptions.painTimes.filter { painTimes.contains($0) }.joined(separator: "、")
     }
 
-    var record: DiaryRecord {
+    func record(pressureMeasurement: PressureMeasurement?) -> DiaryRecord {
         DiaryRecord(
             dateTime: dateTime,
             painLevel: painLevel,
@@ -152,14 +145,14 @@ struct DraftRecord: Equatable, Hashable {
             pressure: pressure,
             dailyActivity: dailyActivity,
             memo: memo,
-            measuredPressureHectopascals: measuredPressureHectopascals,
-            pressureMeasuredAt: pressureMeasuredAt
+            measuredPressureHectopascals: pressureMeasurement?.hectopascals,
+            pressureMeasuredAt: pressureMeasurement?.measuredAt
         )
     }
 }
 
 enum AppRoute: Hashable {
-    case recordInput(PressureMeasurement?)
+    case recordInput
     case savedRecords
     case mandalaData
     case environment(DraftRecord)
@@ -223,7 +216,6 @@ extension Color {
 }
 
 struct ContentView: View {
-    @EnvironmentObject private var pressureStore: PressureMeasurementStore
     @State private var path: [AppRoute] = []
 
     var body: some View {
@@ -253,12 +245,9 @@ struct ContentView: View {
                     Spacer(minLength: 56)
 
                     VStack(spacing: 18) {
-                        Button {
-                            path.append(.recordInput(pressureStore.latestMeasurement))
-                        } label: {
+                        NavigationLink(value: AppRoute.recordInput) {
                             HomeButtonLabel(title: "記録を入力する", color: .accentGreen, foreground: .white)
                         }
-                        .buttonStyle(.plain)
 
                         NavigationLink(value: AppRoute.savedRecords) {
                             HomeButtonLabel(title: "保存を見る", color: .clearButton, foreground: .black)
@@ -275,8 +264,8 @@ struct ContentView: View {
             .navigationBarHidden(true)
             .navigationDestination(for: AppRoute.self) { route in
                 switch route {
-                case .recordInput(let pressureMeasurement):
-                    RecordInputView(path: $path, pressureMeasurement: pressureMeasurement)
+                case .recordInput:
+                    RecordInputView(path: $path)
                 case .savedRecords:
                     SavedRecordsView(path: $path)
                 case .mandalaData:
@@ -297,8 +286,6 @@ struct PressureStatusView: View {
             if let measurement = pressureStore.latestMeasurement {
                 Text(String(format: "最新気圧 %.1f hPa", measurement.hectopascals))
                 Text("測定時刻 \(measurement.measuredAt.formatted(date: .omitted, time: .standard))")
-                PressureChangeStatusView(result: pressureStore.latestPressureChange)
-                    .padding(.top, 5)
             } else {
                 Text(statusText)
             }
@@ -369,12 +356,7 @@ struct HomeButtonLabel: View {
 
 struct RecordInputView: View {
     @Binding var path: [AppRoute]
-    @State private var draft: DraftRecord
-
-    init(path: Binding<[AppRoute]>, pressureMeasurement: PressureMeasurement?) {
-        _path = path
-        _draft = State(initialValue: DraftRecord(pressureMeasurement: pressureMeasurement))
-    }
+    @State private var draft = DraftRecord()
 
     var body: some View {
         FormPage {
@@ -442,6 +424,7 @@ struct RecordInputView: View {
 
 struct EnvironmentInputView: View {
     @EnvironmentObject private var store: DiaryRecordStore
+    @EnvironmentObject private var pressureStore: PressureMeasurementStore
     @Binding var path: [AppRoute]
     @State private var draft: DraftRecord
     @State private var didSave = false
@@ -464,7 +447,7 @@ struct EnvironmentInputView: View {
             OptionPicker(title: "日常の通勤・通学・家事の活動性", selection: $draft.dailyActivity, options: PainRecordOptions.dailyActivities)
 
             Button {
-                store.add(draft.record)
+                store.add(draft.record(pressureMeasurement: pressureStore.currentMeasurement()))
                 didSave = true
             } label: {
                 ActionLabel(title: "保存", color: .accentGreen, foreground: .white)
@@ -600,19 +583,30 @@ struct SavedRecordsView: View {
     }
 
     private func recordSummary(_ record: DiaryRecord) -> String {
-        """
-        日付と時刻: \(record.dateTime)
-        痛みの度合い: \(record.painLevel)
-        動ける状態: \(record.movement)
-        睡眠の状態: \(record.sleep)
-        頭の働き（ブレインフォグ）: \(record.brainFog)
-        痛い時間帯: \(record.painTime)
-        天候: \(record.weather)
-        気温: \(record.temperature)
-        気圧の変化: \(record.pressure)
-        日常の通勤・通学・家事の活動性: \(record.dailyActivity)
-        メモ: \(record.memo)
-        """
+        var lines = [
+            "日付と時刻: \(record.dateTime)",
+            "痛みの度合い: \(record.painLevel)",
+            "動ける状態: \(record.movement)",
+            "睡眠の状態: \(record.sleep)",
+            "頭の働き（ブレインフォグ）: \(record.brainFog)",
+            "痛い時間帯: \(record.painTime)",
+            "天候: \(record.weather)",
+            "気温: \(record.temperature)",
+            "気圧の変化: \(record.pressure)"
+        ]
+
+        if let measuredPressure = record.measuredPressureHectopascals {
+            lines.append(String(format: "実測気圧：%.1f hPa", measuredPressure))
+            if let pressureMeasuredAt = record.pressureMeasuredAt {
+                lines.append(
+                    "気圧測定時刻：\(DateFormatter.pressureMeasurementDateTime.string(from: pressureMeasuredAt))"
+                )
+            }
+        }
+
+        lines.append("日常の通勤・通学・家事の活動性: \(record.dailyActivity)")
+        lines.append("メモ: \(record.memo)")
+        return lines.joined(separator: "\n")
     }
 }
 

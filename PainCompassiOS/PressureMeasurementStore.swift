@@ -26,7 +26,7 @@ final class PressureMeasurementStore: ObservableObject {
 
     private let altimeter = CMAltimeter()
     private let historyKey = "barometric_pressure_history_json"
-    private let saveInterval: TimeInterval = 6 * 60 * 60
+    private let measurementFreshnessInterval: TimeInterval = 60
     private var isMeasuring = false
 
     var latestPressureChange: PressureChangeCalculationResult {
@@ -52,8 +52,23 @@ final class PressureMeasurementStore: ObservableObject {
         loadHistory()
     }
 
+    func currentMeasurement(at referenceDate: Date = Date()) -> PressureMeasurement? {
+        guard isMeasuring,
+              state == .measuring,
+              let latestMeasurement else {
+            return nil
+        }
+
+        let age = referenceDate.timeIntervalSince(latestMeasurement.measuredAt)
+        guard age >= 0, age <= measurementFreshnessInterval else {
+            return nil
+        }
+        return latestMeasurement
+    }
+
     func startMeasuring() {
         guard !isMeasuring else { return }
+        latestMeasurement = nil
 
         guard CMAltimeter.isRelativeAltitudeAvailable() else {
             state = .unavailable
@@ -68,6 +83,9 @@ final class PressureMeasurementStore: ObservableObject {
 
             if error != nil {
                 self.state = .failed
+                self.latestMeasurement = nil
+                self.altimeter.stopRelativeAltitudeUpdates()
+                self.isMeasuring = false
                 return
             }
 
@@ -77,7 +95,6 @@ final class PressureMeasurementStore: ObservableObject {
                 measuredAt: Date()
             )
             self.latestMeasurement = measurement
-            self.saveToHistoryIfNeeded(measurement)
         }
     }
 
@@ -85,6 +102,7 @@ final class PressureMeasurementStore: ObservableObject {
         guard isMeasuring else { return }
         altimeter.stopRelativeAltitudeUpdates()
         isMeasuring = false
+        latestMeasurement = nil
 
         if state == .measuring {
             state = .idle
@@ -99,25 +117,5 @@ final class PressureMeasurementStore: ObservableObject {
         }
 
         history = decodedHistory.sorted { $0.measuredAt < $1.measuredAt }
-    }
-
-    private func saveToHistoryIfNeeded(_ measurement: PressureMeasurement) {
-        if let latestEntry = history.last,
-           measurement.measuredAt.timeIntervalSince(latestEntry.measuredAt) < saveInterval {
-            return
-        }
-
-        history.append(
-            PressureHistoryEntry(
-                hectopascals: measurement.hectopascals,
-                measuredAt: measurement.measuredAt
-            )
-        )
-        saveHistory()
-    }
-
-    private func saveHistory() {
-        guard let data = try? JSONEncoder().encode(history) else { return }
-        UserDefaults.standard.set(data, forKey: historyKey)
     }
 }
