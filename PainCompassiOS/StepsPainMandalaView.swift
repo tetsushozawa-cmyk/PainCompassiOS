@@ -213,12 +213,21 @@ struct StepsPainMandalaMap: View {
             }
 
             for point in positionedPoints where point.point.isLatest {
+                context.fill(
+                    Path(ellipseIn: CGRect(
+                        x: point.position.x - 12,
+                        y: point.position.y - 12,
+                        width: 24,
+                        height: 24
+                    )),
+                    with: .color(Color(red: 245 / 255, green: 184 / 255, blue: 32 / 255))
+                )
                 drawText(
                     "1",
                     in: &context,
                     at: point.position,
-                    color: Color(red: 245 / 255, green: 184 / 255, blue: 32 / 255),
-                    size: 27,
+                    color: .black,
+                    size: 12,
                     weight: .bold
                 )
             }

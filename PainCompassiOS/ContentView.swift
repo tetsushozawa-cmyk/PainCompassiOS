@@ -1009,7 +1009,16 @@ struct MandalaMap: View {
             }
 
             for point in points where point.isLatest {
-                drawText("★", in: &context, at: point.position, color: Color(red: 0.961, green: 0.722, blue: 0.125), size: 27, weight: .bold)
+                context.fill(
+                    Path(ellipseIn: CGRect(
+                        x: point.position.x - 12,
+                        y: point.position.y - 12,
+                        width: 24,
+                        height: 24
+                    )),
+                    with: .color(Color(red: 245 / 255, green: 184 / 255, blue: 32 / 255))
+                )
+                drawText("1", in: &context, at: point.position, color: .black, size: 12, weight: .bold)
             }
         }
     }
@@ -1032,7 +1041,7 @@ struct MandalaMap: View {
             let offset = pointOffset(index: count, isLatest: isLatest)
             return MandalaPoint(
                 position: CGPoint(x: center.x + offset.x, y: center.y + offset.y),
-                label: isLatest ? "★" : "\(displayIndex + 1)",
+                label: "\(displayIndex + 1)",
                 color: colorForRecordDate(date),
                 isLatest: isLatest
             )
