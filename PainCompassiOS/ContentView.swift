@@ -698,7 +698,7 @@ struct MandalaDataView: View {
     @EnvironmentObject private var store: DiaryRecordStore
     @Binding var path: [AppRoute]
     @State private var selectedDays = 7
-    private let periods = [(7, "1週"), (14, "2週"), (28, "4週"), (56, "8週"), (84, "12週")]
+    private let periods = [(7, "1週"), (14, "2週"), (28, "4週"), (56, "8週"), (84, "12週"), (182, "26週")]
 
     private var selectedRecords: [DiaryRecord] {
         let calendar = Calendar.current
@@ -888,7 +888,8 @@ struct MandalaMap: View {
         if daysAgo < 14 { return Color(red: 0.761, green: 0.224, blue: 0.204) }
         if daysAgo < 28 { return Color(red: 0.455, green: 0.290, blue: 0.659) }
         if daysAgo < 56 { return .accentGreen }
-        return .mandalaBlue
+        if daysAgo < 84 { return .mandalaBlue }
+        return Color(red: 0.902, green: 0.435, blue: 0.125)
     }
 
     private func drawText(_ text: String, in context: inout GraphicsContext, at point: CGPoint, color: Color, size: CGFloat, weight: Font.Weight) {
@@ -910,7 +911,8 @@ struct LegendView: View {
         (Color(red: 0.761, green: 0.224, blue: 0.204), "過去2週間"),
         (Color(red: 0.455, green: 0.290, blue: 0.659), "過去4週間"),
         (.accentGreen, "過去8週間"),
-        (.mandalaBlue, "過去12週間")
+        (.mandalaBlue, "過去12週間"),
+        (Color(red: 0.902, green: 0.435, blue: 0.125), "13〜26週")
     ]
 
     var body: some View {
