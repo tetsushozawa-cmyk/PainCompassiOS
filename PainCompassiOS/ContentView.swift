@@ -170,6 +170,9 @@ enum AppRoute: Hashable {
     case recordInput
     case savedRecords
     case mandalaData
+    case olderWeeksMandala
+    case stepsPainMandala
+    case pressurePainMandala
     case environment(DraftRecord)
 }
 
@@ -222,6 +225,7 @@ extension Color {
     static let accentGreen = Color(red: 0.063, green: 0.557, blue: 0.443)
     static let mandalaBlue = Color(red: 0.122, green: 0.298, blue: 0.557)
     static let clearButton = Color(red: 0.925, green: 0.941, blue: 0.957)
+    static let homeClearButton = Color(red: 0.973, green: 0.929, blue: 0.890)
     static let panelBackground = Color.white
     static let softBlue = Color(red: 0.910, green: 0.945, blue: 0.980)
     static let inputBorder = Color(red: 0.835, green: 0.851, blue: 0.871)
@@ -237,47 +241,51 @@ struct ContentView: View {
         NavigationStack(path: $path) {
             ZStack {
                 Color.screenBackground.ignoresSafeArea()
-                VStack(spacing: 0) {
-                    Spacer(minLength: 28)
-                    Image("PainCompassThumbnail")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 116, height: 116)
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                        .padding(.bottom, 18)
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Image("PainCompassThumbnail")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 125, height: 125)
+                            .clipped()
+                            .padding(.top, 40)
+                            .padding(.bottom, 16)
 
-                    Text("疼痛コンパス")
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundStyle(Color.textPrimary)
-                    Text("線維筋痛症ダイアリー")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Color.textSecondary)
-                        .padding(.top, 8)
+                        Text("疼痛コンパス")
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundStyle(Color.textPrimary)
+                            .frame(maxWidth: .infinity)
 
-                    PressureStatusView()
-                        .padding(.top, 12)
+                        Text("線維筋痛症ダイアリー")
+                            .font(.system(size: 18))
+                            .foregroundStyle(Color.textSecondary)
+                            .padding(.top, 8)
 
-                    YesterdayStepCountStatusView()
-                        .padding(.top, 6)
+                        PressureStatusView()
+                            .padding(.top, 16)
 
-                    Spacer(minLength: 56)
+                        YesterdayStepCountStatusView()
+                            .padding(.top, 12)
 
-                    VStack(spacing: 18) {
                         NavigationLink(value: AppRoute.recordInput) {
                             HomeButtonLabel(title: "記録を入力する", color: .accentGreen, foreground: .white)
                         }
+                        .padding(.top, 148)
 
                         NavigationLink(value: AppRoute.savedRecords) {
-                            HomeButtonLabel(title: "保存を見る", color: .clearButton, foreground: .black)
+                            HomeButtonLabel(title: "保存を見る", color: .homeClearButton, foreground: .black)
                         }
+                        .padding(.top, 64)
 
                         NavigationLink(value: AppRoute.mandalaData) {
                             HomeButtonLabel(title: "曼荼羅用データ", color: .mandalaBlue, foreground: .white)
                         }
+                        .padding(.top, 64)
+                        .padding(.bottom, 48)
                     }
-                    Spacer(minLength: 36)
+                    .padding(.horizontal, 24)
+                    .padding(.top, 140)
                 }
-                .padding(.horizontal, 24)
             }
             .navigationBarHidden(true)
             .navigationDestination(for: AppRoute.self) { route in
@@ -288,6 +296,12 @@ struct ContentView: View {
                     SavedRecordsView(path: $path)
                 case .mandalaData:
                     MandalaDataView(path: $path)
+                case .olderWeeksMandala:
+                    OlderWeeksMandalaView(path: $path)
+                case .stepsPainMandala:
+                    StepsPainMandalaView(path: $path)
+                case .pressurePainMandala:
+                    PressurePainMandalaView(path: $path)
                 case .environment(let draft):
                     EnvironmentInputView(path: $path, draft: draft)
                 }
@@ -304,8 +318,8 @@ struct YesterdayStepCountStatusView: View {
             Text(yesterdayStatusText)
             Text(dayBeforeYesterdayStatusText)
         }
-            .font(.system(size: 12))
-            .foregroundStyle(Color.textSecondary)
+            .font(.system(size: 20, weight: .bold))
+            .foregroundStyle(Color.textPrimary)
     }
 
     private var yesterdayStatusText: String {
@@ -343,7 +357,7 @@ struct PressureStatusView: View {
                 Text(statusText)
             }
         }
-        .font(.system(size: 12))
+        .font(.system(size: 14))
         .foregroundStyle(Color.textSecondary)
     }
 
@@ -398,12 +412,12 @@ struct HomeButtonLabel: View {
 
     var body: some View {
         Text(title)
-            .font(.system(size: 18, weight: .bold))
+            .font(.system(size: 16, weight: .bold))
             .foregroundStyle(foreground)
             .frame(maxWidth: .infinity)
-            .frame(minHeight: 72)
-            .background(color, in: RoundedRectangle(cornerRadius: 18))
-            .shadow(color: Color.black.opacity(0.07), radius: 8, x: 0, y: 4)
+            .frame(height: 84)
+            .background(color, in: RoundedRectangle(cornerRadius: 38))
+            .shadow(color: Color.black.opacity(0.10), radius: 2, x: 0, y: 2)
     }
 }
 
@@ -698,6 +712,7 @@ struct MandalaDataView: View {
     @EnvironmentObject private var store: DiaryRecordStore
     @Binding var path: [AppRoute]
     @State private var selectedDays = 7
+    @State private var selectedRecordID: DiaryRecord.ID?
     private let periods = [(7, "1週"), (14, "2週"), (28, "4週"), (56, "8週"), (84, "12週"), (182, "26週")]
 
     private var selectedRecords: [DiaryRecord] {
@@ -711,6 +726,11 @@ struct MandalaDataView: View {
             guard let date = DateFormatter.painRecordDateTime.date(from: record.dateTime) else { return false }
             return date >= start && date <= end
         }
+    }
+
+    private var selectedRecord: DiaryRecord? {
+        guard let selectedRecordID else { return nil }
+        return selectedRecords.first { $0.id == selectedRecordID }
     }
 
     var body: some View {
@@ -739,9 +759,28 @@ struct MandalaDataView: View {
                 }
             }
 
-            Text(mandalaText)
+            VStack(alignment: .leading, spacing: 6) {
+                if selectedRecords.isEmpty {
+                    Text("保存された記録はありません")
+                } else {
+                    ForEach(Array(selectedRecords.enumerated()), id: \.element.id) { index, record in
+                        Button {
+                            selectedRecordID = record.id
+                        } label: {
+                            Text(mandalaRecordText(index: index, record: record))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.vertical, 6)
+                                .padding(.horizontal, 8)
+                                .background(
+                                    selectedRecordID == record.id ? Color.softBlue : Color.clear,
+                                    in: RoundedRectangle(cornerRadius: 8)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
                 .font(.system(size: 17))
-                .lineSpacing(5)
                 .foregroundStyle(Color.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(18)
@@ -767,13 +806,39 @@ struct MandalaDataView: View {
                     )
             }
 
+            if let selectedRecord {
+                MandalaRecordDetail(record: selectedRecord)
+            }
+
             LegendView()
 
-            Button {
-                path.removeAll()
-            } label: {
-                ActionLabel(title: "最初に戻る", color: .clearButton, foreground: .textPrimary)
+            VStack(spacing: 16) {
+                Button {
+                    path.removeAll()
+                } label: {
+                    MandalaNavigationButtonLabel(title: "最初に戻る")
+                }
+
+                NavigationLink(value: AppRoute.olderWeeksMandala) {
+                    MandalaNavigationButtonLabel(title: "13〜26週の曼荼羅")
+                }
+                .padding(.top, 8)
+
+                NavigationLink(value: AppRoute.stepsPainMandala) {
+                    MandalaNavigationButtonLabel(title: "歩数×疼痛の曼荼羅")
+                }
+
+                NavigationLink(value: AppRoute.pressurePainMandala) {
+                    MandalaNavigationButtonLabel(title: "気圧×疼痛の曼荼羅")
+                }
             }
+        }
+        .onChange(of: selectedDays) { _, _ in
+            guard let selectedRecordID,
+                  !selectedRecords.contains(where: { $0.id == selectedRecordID }) else {
+                return
+            }
+            self.selectedRecordID = nil
         }
     }
 
@@ -785,11 +850,116 @@ struct MandalaDataView: View {
         return "対象期間：\(DateFormatter.painRecordDateOnly.string(from: oldest)) ～ \(DateFormatter.painRecordDateOnly.string(from: newest))"
     }
 
-    private var mandalaText: String {
-        guard !selectedRecords.isEmpty else { return "保存された記録はありません" }
-        return selectedRecords.enumerated().map { index, record in
-            "\(index + 1)回前　痛み：\(leadingNumber(record.painLevel))　動ける状態：\(leadingNumber(record.movement))"
+    private func mandalaRecordText(index: Int, record: DiaryRecord) -> String {
+        "\(index + 1)回前　痛み：\(leadingNumber(record.painLevel))　動ける状態：\(leadingNumber(record.movement))"
+    }
+}
+
+struct OlderWeeksMandalaView: View {
+    @EnvironmentObject private var store: DiaryRecordStore
+    @Binding var path: [AppRoute]
+
+    private var records: [DiaryRecord] {
+        let calendar = Calendar.current
+        let todayStart = calendar.startOfDay(for: Date())
+        guard let start = calendar.date(byAdding: .day, value: -181, to: todayStart),
+              let end = calendar.date(byAdding: .day, value: -84, to: todayStart) else {
+            return []
+        }
+
+        return store.records.reversed().filter { record in
+            guard let date = DateFormatter.painRecordDateTime.date(from: record.dateTime) else {
+                return false
+            }
+            return date >= start && date < end
+        }
+    }
+
+    var body: some View {
+        FormPage {
+            Text("13〜26週の曼荼羅")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundStyle(Color.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text("13〜26週の記録：\(records.count)件")
+                .font(.system(size: 16))
+                .foregroundStyle(Color.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            ScrollView(.horizontal) {
+                MandalaMap(records: records)
+                    .frame(width: 372, height: 372)
+                    .padding(10)
+                    .background(Color.panelBackground, in: RoundedRectangle(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(Color.inputBorder.opacity(0.65), lineWidth: 1)
+                    )
+            }
+
+            Text(olderRecordsText)
+                .font(.system(size: 16))
+                .foregroundStyle(Color.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button {
+                if !path.isEmpty {
+                    path.removeLast()
+                }
+            } label: {
+                MandalaNavigationButtonLabel(title: "元の曼荼羅に戻る")
+            }
+        }
+    }
+
+    private var olderRecordsText: String {
+        guard !records.isEmpty else { return "この期間の記録はありません" }
+        return records.enumerated().map { index, record in
+            "\(index + 1). 痛み\(leadingNumber(record.painLevel))・活動\(leadingNumber(record.movement))"
         }.joined(separator: "\n")
+    }
+}
+
+struct MandalaNavigationButtonLabel: View {
+    let title: String
+
+    var body: some View {
+        Text(title)
+            .font(.system(size: 16, weight: .bold))
+            .foregroundStyle(Color.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 56)
+            .background(Color.mandalaBlue, in: RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+struct MandalaRecordDetail: View {
+    let record: DiaryRecord
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("選択した記録")
+                .font(.system(size: 18, weight: .bold))
+            Text("記録日時：\(record.dateTime)")
+            Text("痛みの度合い：\(record.painLevel)")
+            Text("動ける状態：\(record.movement)")
+            if let yesterdayStepCount = record.yesterdayStepCount {
+                Text("昨日の歩数：\(yesterdayStepCount)歩")
+            }
+            if let dayBeforeYesterdayStepCount = record.dayBeforeYesterdayStepCount {
+                Text("一昨日の歩数：\(dayBeforeYesterdayStepCount)歩")
+            }
+        }
+        .font(.system(size: 16))
+        .foregroundStyle(Color.textPrimary)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(18)
+        .background(Color.panelBackground, in: RoundedRectangle(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(Color.inputBorder.opacity(0.65), lineWidth: 1)
+        )
     }
 }
 

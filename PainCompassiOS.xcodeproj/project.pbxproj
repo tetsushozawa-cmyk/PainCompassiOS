@@ -13,6 +13,9 @@
 		A1B2C3D42D2E4D92A4F30121 /* PressureMeasurementStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D52D2E4D92A4F30121 /* PressureMeasurementStore.swift */; };
 		B2C3D4E52D2E4D92A4F30121 /* PressureChangeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E62D2E4D92A4F30121 /* PressureChangeCalculator.swift */; };
 		C3D4E5F62D2E4D92A4F30121 /* YesterdayStepCountStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F72D2E4D92A4F30121 /* YesterdayStepCountStore.swift */; };
+		D4E5F6072D2E4D92A4F30121 /* StepsPainMandalaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F6082D2E4D92A4F30121 /* StepsPainMandalaView.swift */; };
+		E5F607182D2E4D92A4F30121 /* DailyPressureChangeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F607192D2E4D92A4F30121 /* DailyPressureChangeCalculator.swift */; };
+		E5F6071A2D2E4D92A4F30121 /* PressurePainMandalaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6071B2D2E4D92A4F30121 /* PressurePainMandalaView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +27,9 @@
 		B2C3D4E62D2E4D92A4F30121 /* PressureChangeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressureChangeCalculator.swift; sourceTree = "<group>"; };
 		C3D4E5F72D2E4D92A4F30121 /* YesterdayStepCountStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YesterdayStepCountStore.swift; sourceTree = "<group>"; };
 		C3D4E5F82D2E4D92A4F30121 /* PainCompassiOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PainCompassiOS.entitlements; sourceTree = "<group>"; };
+		D4E5F6082D2E4D92A4F30121 /* StepsPainMandalaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsPainMandalaView.swift; sourceTree = "<group>"; };
+		E5F607192D2E4D92A4F30121 /* DailyPressureChangeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyPressureChangeCalculator.swift; sourceTree = "<group>"; };
+		E5F6071B2D2E4D92A4F30121 /* PressurePainMandalaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressurePainMandalaView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +68,9 @@
 				B2C3D4E62D2E4D92A4F30121 /* PressureChangeCalculator.swift */,
 				C3D4E5F72D2E4D92A4F30121 /* YesterdayStepCountStore.swift */,
 				C3D4E5F82D2E4D92A4F30121 /* PainCompassiOS.entitlements */,
+				D4E5F6082D2E4D92A4F30121 /* StepsPainMandalaView.swift */,
+				E5F607192D2E4D92A4F30121 /* DailyPressureChangeCalculator.swift */,
+				E5F6071B2D2E4D92A4F30121 /* PressurePainMandalaView.swift */,
 				8D0D7C932D2E4D92A4F30121 /* Assets.xcassets */,
 			);
 			path = PainCompassiOS;
@@ -146,6 +155,9 @@
 				A1B2C3D42D2E4D92A4F30121 /* PressureMeasurementStore.swift in Sources */,
 				B2C3D4E52D2E4D92A4F30121 /* PressureChangeCalculator.swift in Sources */,
 				C3D4E5F62D2E4D92A4F30121 /* YesterdayStepCountStore.swift in Sources */,
+				D4E5F6072D2E4D92A4F30121 /* StepsPainMandalaView.swift in Sources */,
+				E5F607182D2E4D92A4F30121 /* DailyPressureChangeCalculator.swift in Sources */,
+				E5F6071A2D2E4D92A4F30121 /* PressurePainMandalaView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
