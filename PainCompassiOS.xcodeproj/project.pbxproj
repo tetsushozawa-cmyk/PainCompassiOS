@@ -295,6 +295,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSMotionUsageDescription = "気圧の変化を測定するためにモーションセンサーを使用します。";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "昨日の歩数を表示するために、ヘルスケアの歩数データを読み取ります。";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "健康データを利用する機能に必要な権限について説明するための項目です。本アプリは健康データの書き込みを行いません。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -304,7 +305,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tetsushozawa.PainCompass;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -328,6 +329,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSMotionUsageDescription = "気圧の変化を測定するためにモーションセンサーを使用します。";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "昨日の歩数を表示するために、ヘルスケアの歩数データを読み取ります。";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "健康データを利用する機能に必要な権限について説明するための項目です。本アプリは健康データの書き込みを行いません。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -337,7 +339,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tetsushozawa.PainCompass;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
